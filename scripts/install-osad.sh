@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# Copyright 2015, Rackspace US, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+## Shell Opts ----------------------------------------------------------------
+set -e -u -x
+
+
+## Vars ----------------------------------------------------------------------
+export OSAD_REPO=${OSAD_REPO:-"https://github.com/stackforge/os-ansible-deployment.git"}
+export OSAD_BRANCH=${OSAD_BRANCH:-"master"}
+export IS_AIO=${IS_AIO:-"no"}
+
+# Checkout the branch/tag of OSAD that we want to work with.
+pushd /opt
+    git clone -b $OSAD_BRANCH $OSAD_REPO
+popd
+
+
+# TODO(someone) make this directory a variable.
+pushd /opt/os-ansible-deployment
+    if [ "${IS_AIO}" == "yes" ]; then
+        source scripts/bootstrap-aio.sh
+        source scripts/boostratp-ansible.sh
+    fi
+popd
+
+# Provided minimum necessary variables for rpc-extras
+# This will need to account for actual configuration at some point, though.
+cp -R etc/openstack_deploy/ /etc/openstack_deploy
+echo 'rpc_repo+patch: /opt/os-ansible-deployment' >> /etc/openstack_deploy/user_extras_variables.yml
+
+pushd /opt/ansible-deployment
+    scripts/pw-token-gen.py --file /etc/openstack_deploy/user_extras_secrets.yml
+    bash scripts/run-playbooks.sh
+popd
