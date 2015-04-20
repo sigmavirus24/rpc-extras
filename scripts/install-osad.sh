@@ -24,6 +24,20 @@ export OSAD_REPO=${OSAD_REPO:-"https://github.com/stackforge/${OSAD}.git"}
 export OSAD_BRANCH=${OSAD_BRANCH:-"master"}
 export IS_AIO=${IS_AIO:-"no"}
 
+function bootstrap_aio() {
+    if [ ! -f /etc/network/interfaces.d/aio_interfaces.cfg ]; then
+        # Run the scripts in sub-shells since they check for `dirname ${0}`
+        $(scripts/bootstrap-aio.sh)
+    fi
+}
+
+function bootstrap_ansible() {
+    # We need to bootstrap ansible if it's not already been done.
+    if [ ! -f /usr/local/bin/openstack-ansible ]; then
+        $(scripts/bootstrap-ansible.sh)
+    fi
+}
+
 # Checkout the branch/tag of OSAD that we want to work with.
 pushd /opt
     if [ ! -d "$OSAD" ]; then
@@ -34,11 +48,9 @@ popd
 # Do any bootstrapping work
 pushd /opt/"${OSAD}"
     if [ "${IS_AIO}" == "yes" ]; then
-        # Run the scripts in sub-shells since they check for `dirname ${0}`
-        $(scripts/bootstrap-aio.sh)
+        bootstrap_aio
     fi
-    # We need to bootstrap ansible no matter what.
-    $(scripts/bootstrap-ansible.sh)
+    bootstrap_ansible
 popd
 
 # Provided minimum necessary variables for rpc-extras
