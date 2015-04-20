@@ -57,6 +57,9 @@ pushd /opt/"${OSAD}"
     cp -R etc/openstack_deploy/ /etc/openstack_deploy
     echo 'rpc_repo_path: /opt/os-ansible-deployment' >> /etc/openstack_deploy/user_extras_variables.yml
 
+    if [ ! -f /etc/openstack_deploy/user_extras_secrets.yml ]; then
+        touch /etc/openstack_deploy/user_extras_secrets.yml
+    fi
     scripts/pw-token-gen.py --file /etc/openstack_deploy/user_extras_secrets.yml
     bash scripts/run-playbooks.sh
 popd
