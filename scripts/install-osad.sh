@@ -19,28 +19,33 @@ set -e -u -x
 
 
 ## Vars ----------------------------------------------------------------------
-export OSAD_REPO=${OSAD_REPO:-"https://github.com/stackforge/os-ansible-deployment.git"}
+export OSAD=${OSAD:-"os-ansible-deployment"}
+export OSAD_REPO=${OSAD_REPO:-"https://github.com/stackforge/${OSAD}.git"}
 export OSAD_BRANCH=${OSAD_BRANCH:-"master"}
 export IS_AIO=${IS_AIO:-"no"}
 
 # Checkout the branch/tag of OSAD that we want to work with.
 pushd /opt
-    git clone -b $OSAD_BRANCH $OSAD_REPO
+    if [ ! -d "$OSAD" ]; then
+        git clone -b $OSAD_BRANCH $OSAD_REPO
+    fi
 popd
 
-
-# TODO(someone) make this directory a variable.
-pushd /opt/os-ansible-deployment
+# Do any bootstrapping work
+pushd /opt/"${OSAD}"
     if [ "${IS_AIO}" == "yes" ]; then
-        source scripts/bootstrap-aio.sh
-        source scripts/boostratp-ansible.sh
+        # Run the scripts in sub-shells since they check for `dirname ${0}`
+        $(scripts/bootstrap-aio.sh)
     fi
+    # We need to bootstrap ansible no matter what.
+    $(scripts/bootstrap-ansible.sh)
 popd
 
 # Provided minimum necessary variables for rpc-extras
 # This will need to account for actual configuration at some point, though.
 cp -R etc/openstack_deploy/ /etc/openstack_deploy
-echo 'rpc_repo+patch: /opt/os-ansible-deployment' >> /etc/openstack_deploy/user_extras_variables.yml
+echo 'rpc_repo_path: /opt/os-ansible-deployment' >> /etc/openstack_deploy/user_extras_variables.yml
+
 
 pushd /opt/ansible-deployment
     scripts/pw-token-gen.py --file /etc/openstack_deploy/user_extras_secrets.yml
