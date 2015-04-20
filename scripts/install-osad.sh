@@ -51,15 +51,12 @@ pushd /opt/"${OSAD}"
         bootstrap_aio
     fi
     bootstrap_ansible
-popd
 
-# Provided minimum necessary variables for rpc-extras
-# This will need to account for actual configuration at some point, though.
-cp -R etc/openstack_deploy/ /etc/openstack_deploy
-echo 'rpc_repo_path: /opt/os-ansible-deployment' >> /etc/openstack_deploy/user_extras_variables.yml
+    # Provided minimum necessary variables for rpc-extras
+    # This will need to account for actual configuration at some point, though.
+    cp -R etc/openstack_deploy/ /etc/openstack_deploy
+    echo 'rpc_repo_path: /opt/os-ansible-deployment' >> /etc/openstack_deploy/user_extras_variables.yml
 
-
-pushd /opt/ansible-deployment
     scripts/pw-token-gen.py --file /etc/openstack_deploy/user_extras_secrets.yml
     bash scripts/run-playbooks.sh
 popd
