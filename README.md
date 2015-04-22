@@ -40,39 +40,38 @@ below for more.
 
 Basic Setup:
 
-1. Clone 
-[os-ansible-deployment](https://github.com/stackforge/os-ansible-deployment).
-2. Clone [rpc-extras](https://github.com/rcbops/rpc-extras).
-3. Prepare the os-ansible-deployment configuration. If you're building an AIO
+1. Clone [rpc-extras](https://github.com/rcbops/rpc-extras) with the
+--recursive option to get all the submodules.
+2. Prepare the os-ansible-deployment configuration. If you're building an AIO
 you can simply execute `scripts/bootstrap-aio.sh` from the root of the
 os-ansible-deployment clone.
-4. From the root of the os-ansible-deployment clone, execute
+3. From the root of the os-ansible-deployment clone, execute
 `scripts/bootstrap-ansible.sh`.
-5. Recursively copy `rpc-extras/etc/openstack_deploy/*` to
+4. Recursively copy `rpc-extras/etc/openstack_deploy/*` to
 `/etc/openstack_deploy/`.
-6. Set the `rpc_repo_path` in
+5. Set the `rpc_repo_path` in
 `/etc/openstack_deploy/user_extras_variables.yml` to the path of the
 `os-ansible-deployment` repository clone directory.
-7. Set all other variables in
+6. Set all other variables in
 `/etc/openstack_deploy/user_extras_variables.yml` appropriately.
-8. Edit `rpc-extras/playbooks/ansible.cfg` and ensure the paths to the roles, 
+7. Edit `rpc-extras/playbooks/ansible.cfg` and ensure the paths to the roles, 
 playbooks and inventory are correct.
-9. Generate the random passwords for the extras by executing
+8. Generate the random passwords for the extras by executing
 `scripts/pw-token-gen.py --file
 /etc/openstack_deploy/user_extras_secrets.yml` from the
 `os-ansible-deployment` clone directory.
-10. Change to the `os-ansible-deployment/playbooks` directory and execute the
+9. Change to the `os-ansible-deployment/playbooks` directory and execute the
 plays. You can optionally execute `scripts/run-playbooks.sh` from the root of
 os-ansible-deployment clone.
-11. If you are planning to include the logstash play in the deployment, 
+10. If you are planning to include the logstash play in the deployment, 
 uncomment the related yml block in user_extras_variables.yml now. 
-12. Change to the `rpc-extras/playbooks` directory and execute your
+11. Change to the `rpc-extras/playbooks` directory and execute your
 desired plays.  IE: 
 ```bash
 openstack-ansible site.yml
 ```
 
-13. __Optional__ If the logstash play is included in the deployment, from the
+12. __Optional__ If the logstash play is included in the deployment, from the
 os-ansible-deployment/playbooks directory, run 
 ```bash
 openstack-ansible setup-everything.yml --tags rsyslog-client
