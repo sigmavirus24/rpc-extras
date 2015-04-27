@@ -73,10 +73,12 @@ openstack-ansible site.yml
 
 12. __Optional__ If the logstash play is included in the deployment, from the
 os-ansible-deployment/playbooks directory, run 
+
 ```bash
 openstack-ansible setup-everything.yml --tags rsyslog-client
-``` to apply 
-the needed changes to rsyslog configurations to ship logs to logstash. 
+```
+
+to apply the needed changes to rsyslog configurations to ship logs to logstash. 
 
 # Ansible Roles
 
