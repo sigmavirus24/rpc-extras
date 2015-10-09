@@ -1,0 +1,14 @@
+- name: Ensure container packages are installed
+  yum:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items: maas_rpm_packages
+
+- name: Install pip packages
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_flattened:
+  - maas_pip_packages
+  - maas_pip_dependencies
