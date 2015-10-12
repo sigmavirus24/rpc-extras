@@ -42,3 +42,5 @@
 - include: hp.yml
   when: >
     hp_check == true
+
+- include: local.yml
