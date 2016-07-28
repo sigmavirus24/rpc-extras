@@ -33,9 +33,28 @@ filebeat_logstash_port: "{{ logstash_beats_port |default(5044) }}"
 #"{{ groups['logstash_all'] | map('extract', hostvars, ['container_address']) | list }}"
 filebeat_logstash_hosts: "{% for host in groups['logstash_all'] %}{{ hostvars[host]['ansible_ssh_host'] }}:{{ filebeat_logstash_port }}{% if not loop.last %},{% endif %}{% endfor %}"
 
+filebeat_openstack_services:
+  - cinder
+  - glance
+  - heat
+  - horizon
+  - keystone
+  - neutron
+  - nova
+  - swift
+
+filebeat_openstack_logs: "{% for service in filebeat_openstack_services %}/var/log/{{service}}/*.log{% if not loop.last %},{% endif %}{% endfor %}"
+
 filebeat_config_overrides:
   filebeat:
     prospectors:
+      - paths: "{{ filebeat_openstack_logs.split(',')|list }}"
+        encoding: utf-8
+        input_type: log
+        multiline:
+          pattern: '^[0-9-]{10} +[0-9:\.]+ +[0-9]+ +[A-Z]+ +[A-Za-z0-9\._]+ \[|Traceback'
+          match: after
+          negate: true
       - paths:
         - /var/log/*.log
         - /var/log/*/*.log
